@@ -3,12 +3,20 @@ import React from 'react';
 interface TimestampDisplayProps {
   timestamp: number;
   timezone: number;
+  unit: 'seconds' | 'milliseconds' | 'microseconds';
 }
 
-const TimestampDisplay: React.FC<TimestampDisplayProps> = ({ timestamp, timezone }) => {
+const TimestampDisplay: React.FC<TimestampDisplayProps> = ({ timestamp, timezone, unit }) => {
   // Create date object with timezone offset
   const getDateWithTimezone = (timestamp: number, timezoneOffset: number): Date => {
-    const utcTime = timestamp * 1000;
+    let utcTime;
+    if (unit === 'seconds') {
+      utcTime = timestamp * 1000;
+    } else if (unit === 'milliseconds') {
+      utcTime = timestamp;
+    } else { // microseconds
+      utcTime = timestamp / 1000;
+    }
     const localTime = utcTime + (timezoneOffset * 60 * 60 * 1000);
     return new Date(localTime);
   };
@@ -22,18 +30,10 @@ const TimestampDisplay: React.FC<TimestampDisplayProps> = ({ timestamp, timezone
 
   return (
     <div className="timestamp-display">
-      <h2>Current Timestamp</h2>
       <div className="timestamp-info">
         <div className="timestamp-row">
-          <div className="timestamp-value large">{timestamp}</div>
-        </div>
-        <div className="timestamp-row">
+          <div className="timestamp-value yellow">{timestamp}</div>
           <div className="timestamp-value">{formattedDate}</div>
-        </div>
-        <div className="timestamp-row">
-          <div className="timestamp-value">
-            UTC{timezone >= 0 ? '+' : ''}{timezone}
-          </div>
         </div>
       </div>
     </div>

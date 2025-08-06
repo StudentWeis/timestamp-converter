@@ -2,15 +2,23 @@ import React, { useState } from 'react';
 
 interface TimestampConverterProps {
   timezone: number;
+  unit: 'seconds' | 'milliseconds' | 'microseconds';
 }
 
-const TimestampConverter: React.FC<TimestampConverterProps> = ({ timezone }) => {
+const TimestampConverter: React.FC<TimestampConverterProps> = ({ timezone, unit }) => {
   const [inputTimestamp, setInputTimestamp] = useState<string>('');
   const [inputDateTime, setInputDateTime] = useState<string>('');
   const [convertedResult, setConvertedResult] = useState<string>('');
 
   const formatDateTime = (timestamp: number, timezoneOffset: number): string => {
-    const utcTime = timestamp * 1000;
+    let utcTime;
+    if (unit === 'seconds') {
+      utcTime = timestamp * 1000;
+    } else if (unit === 'milliseconds') {
+      utcTime = timestamp;
+    } else { // microseconds
+      utcTime = timestamp / 1000;
+    }
     const localTime = utcTime + (timezoneOffset * 60 * 60 * 1000);
     const date = new Date(localTime);
     return date.toISOString().slice(0, 19).replace('T', ' ');
@@ -21,7 +29,13 @@ const TimestampConverter: React.FC<TimestampConverterProps> = ({ timezone }) => 
     const date = new Date(dateTimeString + 'Z'); // Treat as UTC
     const utcTime = date.getTime();
     const localTime = utcTime - (timezoneOffset * 60 * 60 * 1000);
-    return Math.floor(localTime / 1000);
+    if (unit === 'seconds') {
+      return Math.floor(localTime / 1000);
+    } else if (unit === 'milliseconds') {
+      return localTime;
+    } else { // microseconds
+      return localTime * 1000;
+    }
   };
 
   const handleTimestampConvert = () => {
@@ -44,20 +58,35 @@ const TimestampConverter: React.FC<TimestampConverterProps> = ({ timezone }) => 
   };
 
   const getCurrentTimestamp = () => {
-    const now = Math.floor(Date.now() / 1000);
-    setInputTimestamp(now.toString());
+    const now = Date.now();
+    let timestamp;
+    if (unit === 'seconds') {
+      timestamp = Math.floor(now / 1000);
+    } else if (unit === 'milliseconds') {
+      timestamp = now;
+    } else { // microseconds
+      timestamp = now * 1000;
+    }
+    setInputTimestamp(timestamp.toString());
   };
 
   const getCurrentDateTime = () => {
     const now = new Date();
-    const formatted = formatDateTime(Math.floor(now.getTime() / 1000), timezone);
+    let timestamp;
+    if (unit === 'seconds') {
+      timestamp = Math.floor(now.getTime() / 1000);
+    } else if (unit === 'milliseconds') {
+      timestamp = now.getTime();
+    } else { // microseconds
+      timestamp = now.getTime() * 1000;
+    }
+    const formatted = formatDateTime(timestamp, timezone);
     setInputDateTime(formatted);
   };
 
   return (
     <div className="timestamp-converter">
-      <h3>Convert Timestamp</h3>
-      
+      <h3>时间戳转换</h3>
       {/* Timestamp to DateTime */}
       <div className="converter-section">
         <h4>Unix Timestamp → Human Readable</h4>
@@ -70,10 +99,10 @@ const TimestampConverter: React.FC<TimestampConverterProps> = ({ timezone }) => 
             className="converter-input"
           />
           <button onClick={handleTimestampConvert} className="convert-btn">
-            Convert
+            转换
           </button>
           <button onClick={getCurrentTimestamp} className="fill-btn" title="Fill current timestamp">
-            Now
+            现在
           </button>
         </div>
       </div>
@@ -90,10 +119,10 @@ const TimestampConverter: React.FC<TimestampConverterProps> = ({ timezone }) => 
             className="converter-input"
           />
           <button onClick={handleDateTimeConvert} className="convert-btn">
-            Convert
+            转换
           </button>
           <button onClick={getCurrentDateTime} className="fill-btn" title="Fill current datetime">
-            Now
+            现在
           </button>
         </div>
       </div>
@@ -101,7 +130,7 @@ const TimestampConverter: React.FC<TimestampConverterProps> = ({ timezone }) => 
       {/* Result */}
       {convertedResult && (
         <div className="converter-result">
-          <h4>Result:</h4>
+          <h4>结果：</h4>
           <div className="result-text">{convertedResult}</div>
         </div>
       )}

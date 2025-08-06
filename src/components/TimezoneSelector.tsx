@@ -40,11 +40,10 @@ const TimezoneSelector: React.FC<TimezoneSelectProps> = ({ selectedTimezone, onT
   };
 
   return (
-    <div className="timezone-selector">
-      <h3>Select Timezone</h3>
+    <div className="timezone-selector compact">
       <div className="selector-container">
-        <select 
-          value={selectedTimezone} 
+        <select
+          value={selectedTimezone}
           onChange={handleTimezoneChange}
           className="timezone-select"
         >

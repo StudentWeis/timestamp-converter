@@ -34,10 +34,8 @@
 }
 
 /* Timestamp Display Styles */
-.timestamp-display h2 {
-  margin: 0 0 16px 0;
-  font-size: 16px;
-  font-weight: 600;
+.timestamp-display {
+  margin-top: 5px;
 }
 
 .timestamp-info {
@@ -67,13 +65,31 @@
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.timestamp-value.large {
-  font-size: 14px;
+.timestamp-value.yellow {
+  font-size: 12px;
   font-weight: 600;
-  color: #FFD700;
+  color: hsl(56, 100%, 50%);
 }
 
 /* Timezone Selector Styles */
+.timezone-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.timezone-selector {
+  flex: 1;
+}
+
+.timezone-selector.compact h3 {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
 .timezone-selector h3 {
   margin: 0 0 16px 0;
   font-size: 16px;
@@ -83,6 +99,12 @@
 .selector-container {
   display: flex;
   align-items: center;
+}
+
+.timezone-selector.compact .timezone-select {
+  width: 140px;
+  padding: 8px 10px;
+  font-size: 12px;
 }
 
 .timezone-select {
@@ -107,6 +129,37 @@
   color: white;
 }
 
+/* Unit Selector Styles */
+.unit-selector {
+  display: flex;
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+.unit-btn {
+  padding: 8px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+  min-width: 30px;
+}
+
+.unit-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.unit-btn.active {
+  background: #FFD700;
+  color: #333;
+  border-color: #FFD700;
+}
+
 /* Timestamp Converter Styles */
 .timestamp-converter h3 {
   margin: 0 0 16px 0;
@@ -129,6 +182,7 @@
   display: flex;
   gap: 8px;
   align-items: center;
+  flex-wrap: nowrap;
 }
 
 .converter-input {
@@ -152,7 +206,8 @@
   color: rgba(255, 255, 255, 0.6);
 }
 
-.convert-btn, .fill-btn {
+.convert-btn,
+.fill-btn {
   padding: 10px 16px;
   border: none;
   border-radius: 8px;
@@ -160,6 +215,8 @@
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .convert-btn {
@@ -208,16 +265,16 @@
 }
 
 /* Responsive adjustments */
-@media (max-width: 380px) {
+@media (max-width: 320px) {
   .app {
     min-width: 320px;
     padding: 12px;
   }
-  
+
   .input-group {
     flex-direction: column;
   }
-  
+
   .converter-input {
     width: 100%;
   }
