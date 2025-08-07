@@ -12,7 +12,7 @@ interface AppState {
 
 const App: React.FC = () => {
   const [currentTimestamp, setCurrentTimestamp] = useState<number>(Math.floor(Date.now() / 1000));
-  const [selectedTimezone, setSelectedTimezone] = useState<number>(0); // UTC offset in hours
+  const [selectedTimezone, setSelectedTimezone] = useState<number>(8); // UTC+8 (China Standard Time)
   const [timestampUnit, setTimestampUnit] = useState<'seconds' | 'milliseconds' | 'microseconds'>('seconds');
 
   // Function to handle unit change with immediate update

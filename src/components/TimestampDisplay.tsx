@@ -9,7 +9,7 @@ interface TimestampDisplayProps {
 const TimestampDisplay: React.FC<TimestampDisplayProps> = ({ timestamp, timezone, unit }) => {
   // Create date object with timezone offset
   const getDateWithTimezone = (timestamp: number, timezoneOffset: number): Date => {
-    let utcTime;
+    let utcTime: number;
     if (unit === 'seconds') {
       utcTime = timestamp * 1000;
     } else if (unit === 'milliseconds') {
