@@ -1,11 +1,11 @@
 {
   "manifest_version": 3,
-  "name": "Unix Timestamp Converter",
-  "version": "1.0.1",
-  "description": "A modern tool to convert Unix timestamps with timezone support. Features real-time display, bidirectional conversion, and multiple precision levels.",
+  "name": "时间戳转换工具",
+  "version": "1.0.0",
+  "description": "具有实时显示，双向转换和多 UTC 支持、以及单位切换等功能。",
   "action": {
     "default_popup": "popup.html",
-    "default_title": "Unix Timestamp Converter"
+    "default_title": "时间戳转换工具"
   },
   "icons": {
     "16": "icons/icon16.png",
