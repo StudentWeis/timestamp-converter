@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import TimestampDisplay from './TimestampDisplay';
+import DateTimePicker from './DateTimePicker';
 import { 
   TimestampUnit, 
   getCurrentTimestamp as getTimestamp, 
   isValidTimestamp, 
-  parseDateTime,
-  formatTimestamp
+  parseDateTime
 } from '../utils/timestamp';
 
 interface TimestampConverterProps {
@@ -18,6 +18,7 @@ const TimestampConverter: React.FC<TimestampConverterProps> = ({ timezone, unit 
   const [inputDateTime, setInputDateTime] = useState<string>('');
   const [convertedResult, setConvertedResult] = useState<string>('');
   const [resultTimestamp, setResultTimestamp] = useState<number | null>(null);
+  const [isDatePickerOpen, setIsDatePickerOpen] = useState<boolean>(false);
 
   const handleTimestampInputChange = (value: string) => {
     // Only allow digits and handle empty strings
@@ -53,19 +54,13 @@ const TimestampConverter: React.FC<TimestampConverterProps> = ({ timezone, unit 
   };
 
   const getCurrentDateTime = () => {
-    // 获取当前时间戳
-    const currentTimestamp = getTimestamp(unit);
-    // 使用工具函数格式化时间，考虑用户选择的时区
-    try {
-      const formatted = formatTimestamp(currentTimestamp, unit, timezone);
-      setInputDateTime(formatted);
-    } catch (error) {
-      console.error('Error formatting current datetime:', error);
-      // 如果格式化失败，回退到基本的ISO格式
-      const now = new Date();
-      const formatted = now.toISOString().slice(0, 19).replace('T', ' ');
-      setInputDateTime(formatted);
-    }
+    // 打开日历选择器而不是直接填入当前时间
+    setIsDatePickerOpen(true);
+  };
+
+  const handleDateTimeSelect = (selectedDateTime: string) => {
+    setInputDateTime(selectedDateTime);
+    setIsDatePickerOpen(false);
   };
 
   // Auto-convert timestamp when input changes
@@ -137,11 +132,20 @@ const TimestampConverter: React.FC<TimestampConverterProps> = ({ timezone, unit 
             onChange={(e) => handleDateTimeInputChange(e.target.value)}
             className="converter-input"
           />
-          <button onClick={getCurrentDateTime} className="fill-btn" title="填入当前时间">
-            现在
+          <button onClick={getCurrentDateTime} className="fill-btn calendar-btn" title="打开日历选择器">
+            📅 选择日期
           </button>
         </div>
       </div>
+
+      {/* Date Time Picker */}
+      <DateTimePicker
+        isOpen={isDatePickerOpen}
+        onClose={() => setIsDatePickerOpen(false)}
+        onSelect={handleDateTimeSelect}
+        timezone={timezone}
+        initialValue={inputDateTime}
+      />
 
       {/* Result using TimestampDisplay component */}
       {resultTimestamp !== null && (
