@@ -100,6 +100,14 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
     }
   };
 
+  const handlePrevYear = () => {
+    setCurrentYear(currentYear - 1);
+  };
+
+  const handleNextYear = () => {
+    setCurrentYear(currentYear + 1);
+  };
+
   const handleConfirm = () => {
     const dateTimeString = `${selectedDate} ${selectedHour}:${selectedMinute}:${selectedSecond}`;
     console.log('Selected datetime:', dateTimeString); // 调试用
@@ -251,9 +259,11 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
         {viewMode === 'date' ? (
           <>
             <div className="datetime-picker-header">
-              <button className="nav-btn" onClick={handlePrevMonth}>‹‹</button>
+              <button className="nav-btn" onClick={handlePrevYear}>‹‹</button>
+              <button className="nav-btn" onClick={handlePrevMonth}>‹</button>
               <span className="month-year">{currentYear}年 {monthNames[currentMonth]}</span>
-              <button className="nav-btn" onClick={handleNextMonth}>››</button>
+              <button className="nav-btn" onClick={handleNextMonth}>›</button>
+              <button className="nav-btn" onClick={handleNextYear}>››</button>
             </div>
             
             <div className="calendar-grid">
