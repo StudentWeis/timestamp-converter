@@ -298,6 +298,11 @@
   line-height: 1.4;
 }
 
+.result-text.error {
+  font-size: medium;
+  color: #e68f8f;
+}
+
 /* Responsive adjustments */
 @media (max-width: 320px) {
   .app {

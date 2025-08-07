@@ -48,7 +48,7 @@ const App: React.FC = () => {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>🕐 时间戳工具</h1>
+        <h1>🕐 时间戳转换工具</h1>
       </header>
 
       <main className="app-main">

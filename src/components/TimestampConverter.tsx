@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import TimestampDisplay from './TimestampDisplay';
 
 interface TimestampConverterProps {
   timezone: number;
@@ -9,6 +10,7 @@ const TimestampConverter: React.FC<TimestampConverterProps> = ({ timezone, unit 
   const [inputTimestamp, setInputTimestamp] = useState<string>('');
   const [inputDateTime, setInputDateTime] = useState<string>('');
   const [convertedResult, setConvertedResult] = useState<string>('');
+  const [resultTimestamp, setResultTimestamp] = useState<number | null>(null);
 
   const formatDateTime = (timestamp: number, timezoneOffset: number): string => {
     try {
@@ -17,19 +19,22 @@ const TimestampConverter: React.FC<TimestampConverterProps> = ({ timezone, unit 
         throw new Error('Invalid timestamp');
       }
 
-      let utcTime;
+      let utcTime: number;
       if (unit === 'seconds') {
-        if (timestamp > 5502444800) {
+        // Check for reasonable timestamp range (1970-2100)
+        if (timestamp > 4102444800) { // 2100-01-01 in seconds
           throw new Error('Timestamp too large');
         }
         utcTime = timestamp * 1000;
       } else if (unit === 'milliseconds') {
-        if (timestamp > 5502444800000) {
+        // Check for reasonable timestamp range
+        if (timestamp > 4102444800000) { // 2100-01-01 in milliseconds
           throw new Error('Timestamp too large');
         }
         utcTime = timestamp;
       } else { // microseconds
-        if (timestamp > 5502444800000000) {
+        // Check for reasonable timestamp range
+        if (timestamp > 4102444800000000) { // 2100-01-01 in microseconds
           throw new Error('Timestamp too large');
         }
         utcTime = timestamp / 1000;
@@ -63,32 +68,41 @@ const TimestampConverter: React.FC<TimestampConverterProps> = ({ timezone, unit 
     }
   };
 
-  const handleTimestampConvert = () => {
-    try {
-      const timestamp = parseInt(inputTimestamp, 10);
-      if (!isNaN(timestamp) && Number.isFinite(timestamp)) {
-        const converted = formatDateTime(timestamp, timezone);
-        setConvertedResult(`时间戳 ${timestamp} → ${converted} (UTC${timezone >= 0 ? '+' : ''}${timezone})`);
-      } else {
-        setConvertedResult('无效的时间戳');
-      }
-    } catch (error) {
-      setConvertedResult('时间戳过大或无效');
+  const handleTimestampInputChange = (value: string) => {
+    // Only allow digits and handle empty strings
+    if (value !== '' && !/^\d+$/.test(value)) {
+      return; // Don't update if input contains non-digits
     }
+
+    // Limit input length to prevent extremely large numbers
+    if (value.length > 20) {
+      return; // Don't update if input is too long
+    }
+
+    setInputTimestamp(value);
+    // Clear datetime input when timestamp input changes
+    if (inputDateTime !== '') {
+      setInputDateTime('');
+    }
+    // Clear result when input changes
+    setResultTimestamp(null);
+    setConvertedResult('');
   };
 
-  const handleDateTimeConvert = () => {
-    try {
-      const timestamp = parseDateTime(inputDateTime, timezone);
-      setConvertedResult(`${inputDateTime} (UTC${timezone >= 0 ? '+' : ''}${timezone}) → ${timestamp}`);
-    } catch (error) {
-      setConvertedResult('无效的日期格式。请使用：YYYY-MM-DD HH:MM:SS');
+  const handleDateTimeInputChange = (value: string) => {
+    setInputDateTime(value);
+    // Clear timestamp input when datetime input changes
+    if (inputTimestamp !== '') {
+      setInputTimestamp('');
     }
+    // Clear result when input changes
+    setResultTimestamp(null);
+    setConvertedResult('');
   };
 
   const getCurrentTimestamp = () => {
     const now = Date.now();
-    let timestamp: number;
+    let timestamp;
     if (unit === 'seconds') {
       timestamp = Math.floor(now / 1000);
     } else if (unit === 'milliseconds') {
@@ -101,7 +115,7 @@ const TimestampConverter: React.FC<TimestampConverterProps> = ({ timezone, unit 
 
   const getCurrentDateTime = () => {
     const now = new Date();
-    let timestamp: number;
+    let timestamp;
     if (unit === 'seconds') {
       timestamp = Math.floor(now.getTime() / 1000);
     } else if (unit === 'milliseconds') {
@@ -113,43 +127,40 @@ const TimestampConverter: React.FC<TimestampConverterProps> = ({ timezone, unit 
     setInputDateTime(formatted);
   };
 
-  const handleTimestampInputChange = (value: string) => {
-    // Limit input length to prevent extremely large numbers
-    if (value.length > 16) {
-      return; // Don't update if input is too long
-    }
-
-    setInputTimestamp(value);
-    // Clear datetime input when timestamp input changes
-    if (inputDateTime !== '') {
-      setInputDateTime('');
-    }
-  };
-
-  const handleDateTimeInputChange = (value: string) => {
-    setInputDateTime(value);
-    // Clear timestamp input when datetime input changes
-    if (inputTimestamp !== '') {
-      setInputTimestamp('');
-    }
-  };
-
   // Auto-convert timestamp when input changes
   useEffect(() => {
     if (inputTimestamp.trim() !== '') {
       try {
         const timestamp = parseInt(inputTimestamp, 10);
-        if (!isNaN(timestamp) && Number.isFinite(timestamp)) {
-          const converted = formatDateTime(timestamp, timezone);
-          setConvertedResult(`${timestamp} → ${converted} (UTC${timezone >= 0 ? '+' : ''}${timezone})`);
+        if (!isNaN(timestamp) && Number.isFinite(timestamp) && timestamp >= 0) {
+          // Additional range checks based on unit
+          let isValid = false;
+          if (unit === 'seconds' && timestamp <= 4102444800) {
+            isValid = true;
+          } else if (unit === 'milliseconds' && timestamp <= 4102444800000) {
+            isValid = true;
+          } else if (unit === 'microseconds' && timestamp <= 4102444800000000) {
+            isValid = true;
+          }
+
+          if (isValid) {
+            setResultTimestamp(timestamp);
+            setConvertedResult('');
+          } else {
+            setConvertedResult('时间戳超出合理范围（不能晚于2100年）');
+            setResultTimestamp(null);
+          }
         } else {
           setConvertedResult('无效的时间戳');
+          setResultTimestamp(null);
         }
       } catch (error) {
         setConvertedResult('时间戳过大或无效');
+        setResultTimestamp(null);
       }
     } else {
       setConvertedResult('');
+      setResultTimestamp(null);
     }
   }, [inputTimestamp, timezone, unit]);
 
@@ -158,12 +169,15 @@ const TimestampConverter: React.FC<TimestampConverterProps> = ({ timezone, unit 
     if (inputDateTime.trim() !== '') {
       try {
         const timestamp = parseDateTime(inputDateTime, timezone);
-        setConvertedResult(`${inputDateTime} (UTC${timezone >= 0 ? '+' : ''}${timezone}) → ${timestamp}`);
+        setResultTimestamp(timestamp);
+        setConvertedResult('');
       } catch (error) {
         setConvertedResult('无效的日期格式。请使用：YYYY-MM-DD HH:MM:SS');
+        setResultTimestamp(null);
       }
     } else if (inputTimestamp.trim() === '') {
       setConvertedResult('');
+      setResultTimestamp(null);
     }
   }, [inputDateTime, timezone, unit]);
 
@@ -202,11 +216,18 @@ const TimestampConverter: React.FC<TimestampConverterProps> = ({ timezone, unit 
         </div>
       </div>
 
-      {/* Result */}
-      {convertedResult && (
-        <div className="converter-result">
-          <div className="result-text">{convertedResult}</div>
-        </div>
+      {/* Result using TimestampDisplay component */}
+      {resultTimestamp !== null && (
+        <TimestampDisplay
+          timestamp={resultTimestamp}
+          timezone={timezone}
+          unit={unit}
+        />
+      )}
+
+      {/* Error message */}
+      {convertedResult && resultTimestamp === null && (
+        <div className="result-text error">{convertedResult}</div>
       )}
     </div>
   );
