@@ -1,12 +1,13 @@
 {
-  "name": "timestamp-converter-extension",
-  "version": "1.0.0",
-  "description": "Unix timestamp converter tool for Edge browser",
+  "name": "unix-timestamp-converter-extension",
+  "version": "1.0.1",
+  "description": "A modern Unix timestamp converter extension for Microsoft Edge browser with timezone support",
   "main": "dist/popup.js",
   "scripts": {
     "dev": "webpack --mode development --watch",
     "build": "webpack --mode production",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf dist"
   },
   "dependencies": {
     "react": "^18.2.0",
@@ -25,7 +26,24 @@
     "css-loader": "^6.8.0",
     "style-loader": "^3.3.0"
   },
-  "keywords": ["timestamp", "converter", "unix", "edge", "extension"],
-  "author": "Your Name",
-  "license": "MIT"
+  "keywords": [
+    "timestamp", 
+    "converter", 
+    "unix", 
+    "edge", 
+    "extension",
+    "timezone",
+    "react",
+    "typescript"
+  ],
+  "author": "Developer",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/unix-timestamp-converter"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/unix-timestamp-converter/issues"
+  },
+  "homepage": "https://github.com/your-username/unix-timestamp-converter#readme"
 }

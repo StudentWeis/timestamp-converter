@@ -1,11 +1,11 @@
 {
   "manifest_version": 3,
   "name": "Unix Timestamp Converter",
-  "version": "1.0.0",
-  "description": "A handy tool to convert Unix timestamps and view current time in different UTC timezones",
+  "version": "1.0.1",
+  "description": "A modern tool to convert Unix timestamps with timezone support. Features real-time display, bidirectional conversion, and multiple precision levels.",
   "action": {
     "default_popup": "popup.html",
-    "default_title": "Timestamp Converter"
+    "default_title": "Unix Timestamp Converter"
   },
   "icons": {
     "16": "icons/icon16.png",
