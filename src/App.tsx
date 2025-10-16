@@ -8,7 +8,7 @@ import './styles/App.css';
 const App: React.FC = () => {
   const [currentTimestamp, setCurrentTimestamp] = useState<number>(getCurrentTimestamp('seconds'));
   const [selectedTimezone, setSelectedTimezone] = useState<number>(8); // UTC+8 default
-  const [timestampUnit, setTimestampUnit] = useState<TimestampUnit>('seconds');
+  const [timestampUnit, setTimestampUnit] = useState<TimestampUnit>('milliseconds');
 
   const handleUnitChange = (newUnit: TimestampUnit) => {
     setTimestampUnit(newUnit);

@@ -179,8 +179,6 @@ src/
 
 <div align="center">
 
-**[🌟 给个 Star](https://github.com/your-username/timestamp-plugin) | [🐛 报告问题](https://github.com/your-username/timestamp-plugin/issues) | [💡 功能建议](https://github.com/your-username/timestamp-plugin/issues)**
-
-Made with ❤️ by [Your Name]
+Made with ❤️ by Student Wei!
 
 </div>
