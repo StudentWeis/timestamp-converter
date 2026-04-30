@@ -226,17 +226,3 @@ _支持从 UTC-12 到 UTC+12 的所有时区_
 ## 📄 许可证
 
 本项目基于 [MIT 许可证](LICENSE) 开源。
-
-## 🙏 致谢
-
-- React 团队提供优秀的前端框架
-- Microsoft Edge 扩展平台
-- TypeScript 类型系统支持
-
----
-
-<div align="center">
-
-Made with ❤️ by Student Wei!
-
-</div>

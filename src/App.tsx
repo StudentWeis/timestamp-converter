@@ -5,13 +5,16 @@ import TimezoneSelector from './components/TimezoneSelector';
 import { TimestampUnit, getCurrentTimestamp } from './utils/timestamp';
 import './styles/App.css';
 
+const defaultTimestampUnit: TimestampUnit = 'milliseconds';
+
 const App: React.FC = () => {
-  const [currentTimestamp, setCurrentTimestamp] = useState<number>(
-    getCurrentTimestamp('seconds'),
+  const [timestampUnit, setTimestampUnit] = useState<TimestampUnit>(
+    defaultTimestampUnit,
+  );
+  const [currentTimestamp, setCurrentTimestamp] = useState<number>(() =>
+    getCurrentTimestamp(defaultTimestampUnit),
   );
   const [selectedTimezone, setSelectedTimezone] = useState<number>(8); // UTC+8 default
-  const [timestampUnit, setTimestampUnit] =
-    useState<TimestampUnit>('milliseconds');
 
   const handleUnitChange = (newUnit: TimestampUnit) => {
     setTimestampUnit(newUnit);

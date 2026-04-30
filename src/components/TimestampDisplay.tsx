@@ -69,7 +69,7 @@ const TimestampDisplay: React.FC<TimestampDisplayProps> = ({
         <div className="timestamp-row">
           <button
             type="button"
-            className={`timestamp-value clickable ${copiedItem === 'datetime' ? 'copied' : ''}`}
+            className={`timestamp-value datetime-display clickable ${copiedItem === 'datetime' ? 'copied' : ''}`}
             onClick={() => handleCopy(formattedDate, 'datetime')}
             title={copiedItem === 'datetime' ? '已复制！' : '点击复制时间'}
             aria-label={`复制格式化时间 ${formattedDate}`}

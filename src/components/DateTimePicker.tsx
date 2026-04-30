@@ -385,7 +385,7 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
       <div
         ref={dialogRef}
         id="datetime-picker-dialog"
-        className="datetime-picker"
+        className={`datetime-picker ${viewMode === 'time' ? 'time-view' : 'date-view'}`}
         role="dialog"
         aria-modal="true"
         aria-labelledby="datetime-picker-title"
