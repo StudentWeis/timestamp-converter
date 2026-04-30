@@ -28,5 +28,5 @@ export const timezones: Timezone[] = [
   { label: 'UTC+9 东京', value: 9 },
   { label: 'UTC+10 悉尼', value: 10 },
   { label: 'UTC+11 努美阿', value: 11 },
-  { label: 'UTC+12 奥克兰', value: 12 }
+  { label: 'UTC+12 奥克兰', value: 12 },
 ];

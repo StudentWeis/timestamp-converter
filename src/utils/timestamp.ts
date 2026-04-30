@@ -11,7 +11,10 @@ const MAX_TIMESTAMPS = {
 /**
  * Validates if a timestamp is within reasonable range
  */
-export const isValidTimestamp = (timestamp: number, unit: TimestampUnit): boolean => {
+export const isValidTimestamp = (
+  timestamp: number,
+  unit: TimestampUnit,
+): boolean => {
   return (
     Number.isFinite(timestamp) &&
     timestamp >= 0 &&
@@ -22,7 +25,10 @@ export const isValidTimestamp = (timestamp: number, unit: TimestampUnit): boolea
 /**
  * Converts timestamp to UTC milliseconds
  */
-export const timestampToUTC = (timestamp: number, unit: TimestampUnit): number => {
+export const timestampToUTC = (
+  timestamp: number,
+  unit: TimestampUnit,
+): number => {
   switch (unit) {
     case 'seconds':
       return timestamp * 1000;
@@ -38,7 +44,7 @@ export const timestampToUTC = (timestamp: number, unit: TimestampUnit): number =
  */
 export const utcMillisecondsToTimestamp = (
   utcMilliseconds: number,
-  unit: TimestampUnit
+  unit: TimestampUnit,
 ): number => {
   switch (unit) {
     case 'seconds':
@@ -71,14 +77,14 @@ export const getCurrentTimestamp = (unit: TimestampUnit): number => {
 export const formatTimestamp = (
   timestamp: number,
   unit: TimestampUnit,
-  timezoneOffset: number
+  timezoneOffset: number,
 ): string => {
   if (!isValidTimestamp(timestamp, unit)) {
     throw new Error('Invalid timestamp');
   }
 
   const utcTime = timestampToUTC(timestamp, unit);
-  const localTime = utcTime + (timezoneOffset * 60 * 60 * 1000);
+  const localTime = utcTime + timezoneOffset * 60 * 60 * 1000;
   const date = new Date(localTime);
 
   if (isNaN(date.getTime())) {
@@ -94,16 +100,26 @@ export const formatTimestamp = (
 export const parseDateTime = (
   dateTimeString: string,
   unit: TimestampUnit,
-  timezoneOffset: number
+  timezoneOffset: number,
 ): number => {
   const trimmedValue = dateTimeString.trim();
-  const match = trimmedValue.match(/^(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2}):(\d{2})$/);
+  const match = trimmedValue.match(
+    /^(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2}):(\d{2})$/,
+  );
 
   if (!match) {
     throw new Error('Invalid date format');
   }
 
-  const [, yearValue, monthValue, dayValue, hourValue, minuteValue, secondValue] = match;
+  const [
+    ,
+    yearValue,
+    monthValue,
+    dayValue,
+    hourValue,
+    minuteValue,
+    secondValue,
+  ] = match;
   const year = Number(yearValue);
   const month = Number(monthValue);
   const day = Number(dayValue);
@@ -111,7 +127,9 @@ export const parseDateTime = (
   const minute = Number(minuteValue);
   const second = Number(secondValue);
 
-  const localReference = new Date(Date.UTC(year, month - 1, day, hour, minute, second));
+  const localReference = new Date(
+    Date.UTC(year, month - 1, day, hour, minute, second),
+  );
 
   if (
     Number.isNaN(localReference.getTime()) ||
@@ -125,7 +143,8 @@ export const parseDateTime = (
     throw new Error('Invalid date');
   }
 
-  const utcMilliseconds = localReference.getTime() - (timezoneOffset * 60 * 60 * 1000);
+  const utcMilliseconds =
+    localReference.getTime() - timezoneOffset * 60 * 60 * 1000;
 
   return utcMillisecondsToTimestamp(utcMilliseconds, unit);
 };

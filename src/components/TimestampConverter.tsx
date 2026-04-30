@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import DateTimePicker from './DateTimePicker';
-import { 
-  TimestampUnit, 
-  getCurrentTimestamp as getTimestamp, 
+import {
+  TimestampUnit,
+  getCurrentTimestamp as getTimestamp,
   formatTimestamp,
-  isValidTimestamp, 
+  isValidTimestamp,
   parseDateTime,
   timestampToUTC,
   utcMillisecondsToTimestamp,
@@ -15,7 +15,10 @@ interface TimestampConverterProps {
   unit: TimestampUnit;
 }
 
-const TimestampConverter: React.FC<TimestampConverterProps> = ({ timezone, unit }) => {
+const TimestampConverter: React.FC<TimestampConverterProps> = ({
+  timezone,
+  unit,
+}) => {
   const [inputTimestamp, setInputTimestamp] = useState<string>('');
   const [inputDateTime, setInputDateTime] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string>('');
@@ -62,7 +65,7 @@ const TimestampConverter: React.FC<TimestampConverterProps> = ({ timezone, unit 
       setInputDateTime(formatTimestamp(timestamp, unit, timezone));
       setSyncedUtcTime(timestampToUTC(timestamp, unit));
       setErrorMessage('');
-    } catch (error) {
+    } catch {
       setInputDateTime('');
       setSyncedUtcTime(null);
       setErrorMessage('时间戳超出合理范围或无效');
@@ -90,7 +93,7 @@ const TimestampConverter: React.FC<TimestampConverterProps> = ({ timezone, unit 
       setInputTimestamp(timestamp.toString());
       setSyncedUtcTime(timestampToUTC(timestamp, unit));
       setErrorMessage('');
-    } catch (error) {
+    } catch {
       setInputTimestamp('');
       setSyncedUtcTime(null);
       setErrorMessage('无效的日期格式。请使用：YYYY-MM-DD HH:MM:SS');
@@ -115,7 +118,8 @@ const TimestampConverter: React.FC<TimestampConverterProps> = ({ timezone, unit 
 
   useEffect(() => {
     const previousConfig = previousConfigRef.current;
-    const configChanged = previousConfig.timezone !== timezone || previousConfig.unit !== unit;
+    const configChanged =
+      previousConfig.timezone !== timezone || previousConfig.unit !== unit;
 
     previousConfigRef.current = { timezone, unit };
 
@@ -141,7 +145,9 @@ const TimestampConverter: React.FC<TimestampConverterProps> = ({ timezone, unit 
   return (
     <div className="timestamp-converter">
       <div className="field-group converter-section">
-        <label className="sr-only" htmlFor="timestamp-input">时间戳</label>
+        <label className="sr-only" htmlFor="timestamp-input">
+          时间戳
+        </label>
         <div className="input-group">
           <input
             id="timestamp-input"
@@ -167,7 +173,9 @@ const TimestampConverter: React.FC<TimestampConverterProps> = ({ timezone, unit 
       </div>
 
       <div className="field-group converter-section">
-        <label className="sr-only" htmlFor="datetime-input">日期时间</label>
+        <label className="sr-only" htmlFor="datetime-input">
+          日期时间
+        </label>
         <div className="input-group">
           <input
             ref={dateTimeInputRef}
@@ -205,7 +213,9 @@ const TimestampConverter: React.FC<TimestampConverterProps> = ({ timezone, unit 
       />
 
       {errorMessage && (
-        <div className="result-text error" id="converter-status" role="alert">{errorMessage}</div>
+        <div className="result-text error" id="converter-status" role="alert">
+          {errorMessage}
+        </div>
       )}
     </div>
   );

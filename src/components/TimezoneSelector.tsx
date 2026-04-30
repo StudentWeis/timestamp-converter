@@ -6,18 +6,22 @@ interface TimezoneSelectProps {
   onTimezoneChange: (timezone: number) => void;
 }
 
-const TimezoneSelector: React.FC<TimezoneSelectProps> = ({ 
-  selectedTimezone, 
-  onTimezoneChange 
+const TimezoneSelector: React.FC<TimezoneSelectProps> = ({
+  selectedTimezone,
+  onTimezoneChange,
 }) => {
-  const handleTimezoneChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleTimezoneChange = (
+    event: React.ChangeEvent<HTMLSelectElement>,
+  ) => {
     const newTimezone = parseInt(event.target.value, 10);
     onTimezoneChange(newTimezone);
   };
 
   return (
     <div className="timezone-selector compact">
-      <label className="sr-only" htmlFor="timezone-select">时区</label>
+      <label className="sr-only" htmlFor="timezone-select">
+        时区
+      </label>
       <div className="selector-container">
         <select
           id="timezone-select"

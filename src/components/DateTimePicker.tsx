@@ -8,32 +8,35 @@ interface DateTimePickerProps {
   initialValue?: string;
 }
 
-const DateTimePicker: React.FC<DateTimePickerProps> = ({ 
-  isOpen, 
-  onClose, 
-  onSelect, 
+const DateTimePicker: React.FC<DateTimePickerProps> = ({
+  isOpen,
+  onClose,
+  onSelect,
   timezone,
-  initialValue 
+  initialValue,
 }) => {
   const dialogRef = useRef<HTMLDivElement>(null);
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [selectedHour, setSelectedHour] = useState<string>('00');
   const [selectedMinute, setSelectedMinute] = useState<string>('00');
   const [selectedSecond, setSelectedSecond] = useState<string>('00');
-  const [currentMonth, setCurrentMonth] = useState<number>(new Date().getMonth());
-  const [currentYear, setCurrentYear] = useState<number>(new Date().getFullYear());
+  const [currentMonth, setCurrentMonth] = useState<number>(
+    new Date().getMonth(),
+  );
+  const [currentYear, setCurrentYear] = useState<number>(
+    new Date().getFullYear(),
+  );
+  const [todayKey, setTodayKey] = useState<string>('');
   const [viewMode, setViewMode] = useState<'date' | 'time'>('date');
 
   const buildDateKey = (year: number, month: number, day: number) => {
     return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
   };
 
-  const getTimezoneNow = () => {
-    return new Date(Date.now() + timezone * 60 * 60 * 1000);
-  };
-
   const parseInitialValue = (value: string) => {
-    const match = value.match(/^(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2}):(\d{2})$/);
+    const match = value.match(
+      /^(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2}):(\d{2})$/,
+    );
 
     if (!match) {
       return null;
@@ -54,7 +57,15 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
   useEffect(() => {
     if (isOpen) {
       setViewMode('date');
-      
+      const timezoneNow = new Date(Date.now() + timezone * 60 * 60 * 1000);
+      setTodayKey(
+        buildDateKey(
+          timezoneNow.getUTCFullYear(),
+          timezoneNow.getUTCMonth(),
+          timezoneNow.getUTCDate(),
+        ),
+      );
+
       if (initialValue) {
         const parsedValue = parseInitialValue(initialValue);
 
@@ -69,13 +80,12 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
         }
       }
 
-      const timezoneNow = getTimezoneNow();
       setSelectedDate(
         buildDateKey(
           timezoneNow.getUTCFullYear(),
           timezoneNow.getUTCMonth(),
-          timezoneNow.getUTCDate()
-        )
+          timezoneNow.getUTCDate(),
+        ),
       );
       setSelectedHour(String(timezoneNow.getUTCHours()).padStart(2, '0'));
       setSelectedMinute(String(timezoneNow.getUTCMinutes()).padStart(2, '0'));
@@ -97,23 +107,44 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
         return;
       }
 
-      const preferredSelector = viewMode === 'date'
-        ? '.calendar-day.selected, .calendar-day.current-month'
-        : '.time-item.selected';
-      const preferredElement = dialog.querySelector<HTMLElement>(preferredSelector);
+      const preferredSelector =
+        viewMode === 'date'
+          ? '.calendar-day.selected, .calendar-day.current-month'
+          : '.time-item.selected';
+      const preferredElement =
+        dialog.querySelector<HTMLElement>(preferredSelector);
       const fallbackElement = dialog.querySelector<HTMLElement>('button');
 
       (preferredElement ?? fallbackElement)?.focus();
     });
 
     return () => window.cancelAnimationFrame(frameId);
-  }, [isOpen, viewMode, currentMonth, currentYear, selectedDate, selectedHour, selectedMinute, selectedSecond]);
+  }, [
+    isOpen,
+    viewMode,
+    currentMonth,
+    currentYear,
+    selectedDate,
+    selectedHour,
+    selectedMinute,
+    selectedSecond,
+  ]);
 
   if (!isOpen) return null;
 
   const monthNames = [
-    '1月', '2月', '3月', '4月', '5月', '6月',
-    '7月', '8月', '9月', '10月', '11月', '12月'
+    '1月',
+    '2月',
+    '3月',
+    '4月',
+    '5月',
+    '6月',
+    '7月',
+    '8月',
+    '9月',
+    '10月',
+    '11月',
+    '12月',
   ];
 
   const weekDays = ['日', '一', '二', '三', '四', '五', '六'];
@@ -163,11 +194,11 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
   };
 
   const handleNow = () => {
-    const timezoneNow = getTimezoneNow();
+    const timezoneNow = new Date(Date.now() + timezone * 60 * 60 * 1000);
     const dateString = buildDateKey(
       timezoneNow.getUTCFullYear(),
       timezoneNow.getUTCMonth(),
-      timezoneNow.getUTCDate()
+      timezoneNow.getUTCDate(),
     );
     const timeString = [
       String(timezoneNow.getUTCHours()).padStart(2, '0'),
@@ -199,7 +230,7 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
     }
 
     const focusableElements = Array.from(
-      dialog.querySelectorAll<HTMLElement>('button:not([disabled])')
+      dialog.querySelectorAll<HTMLElement>('button:not([disabled])'),
     );
 
     if (focusableElements.length === 0) {
@@ -223,26 +254,24 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
   const renderCalendar = () => {
     const daysInMonth = getDaysInMonth(currentMonth, currentYear);
     const firstDay = getFirstDayOfMonth(currentMonth, currentYear);
-    const timezoneToday = getTimezoneNow();
-    const todayKey = buildDateKey(
-      timezoneToday.getUTCFullYear(),
-      timezoneToday.getUTCMonth(),
-      timezoneToday.getUTCDate()
-    );
     const days = [];
-    
+
     // 获取上个月的最后几天
     const prevMonth = currentMonth === 0 ? 11 : currentMonth - 1;
     const prevYear = currentMonth === 0 ? currentYear - 1 : currentYear;
     const prevMonthDays = getDaysInMonth(prevMonth, prevYear);
-    
+
     // 添加上个月的日期（灰色显示）
     for (let i = firstDay - 1; i >= 0; i--) {
       const day = prevMonthDays - i;
       days.push(
-        <span key={`prev-${day}`} className="calendar-day prev-month" aria-hidden="true">
+        <span
+          key={`prev-${day}`}
+          className="calendar-day prev-month"
+          aria-hidden="true"
+        >
           {day}
-        </span>
+        </span>,
       );
     }
 
@@ -262,7 +291,7 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
           aria-label={`${currentYear}年${currentMonth + 1}月${day}日`}
         >
           {day}
-        </button>
+        </button>,
       );
     }
 
@@ -270,9 +299,13 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
     const remainingCells = totalCells - days.length;
     for (let day = 1; day <= remainingCells; day++) {
       days.push(
-        <span key={`next-${day}`} className="calendar-day next-month" aria-hidden="true">
+        <span
+          key={`next-${day}`}
+          className="calendar-day next-month"
+          aria-hidden="true"
+        >
           {day}
-        </span>
+        </span>,
       );
     }
 
@@ -280,16 +313,22 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
   };
 
   const renderTimeSelector = () => {
-    const hours = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, '0'));
-    const minutes = Array.from({ length: 60 }, (_, i) => i.toString().padStart(2, '0'));
-    const seconds = Array.from({ length: 60 }, (_, i) => i.toString().padStart(2, '0'));
+    const hours = Array.from({ length: 24 }, (_, i) =>
+      i.toString().padStart(2, '0'),
+    );
+    const minutes = Array.from({ length: 60 }, (_, i) =>
+      i.toString().padStart(2, '0'),
+    );
+    const seconds = Array.from({ length: 60 }, (_, i) =>
+      i.toString().padStart(2, '0'),
+    );
 
     return (
       <div className="time-selector">
         <div className="time-column">
           <div className="time-header">时</div>
           <div className="time-list">
-            {hours.map(hour => (
+            {hours.map((hour) => (
               <button
                 type="button"
                 key={hour}
@@ -306,7 +345,7 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
         <div className="time-column">
           <div className="time-header">分</div>
           <div className="time-list">
-            {minutes.map(minute => (
+            {minutes.map((minute) => (
               <button
                 type="button"
                 key={minute}
@@ -323,7 +362,7 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
         <div className="time-column">
           <div className="time-header">秒</div>
           <div className="time-list">
-            {seconds.map(second => (
+            {seconds.map((second) => (
               <button
                 type="button"
                 key={second}
@@ -356,23 +395,53 @@ const DateTimePicker: React.FC<DateTimePickerProps> = ({
         {viewMode === 'date' ? (
           <>
             <div className="datetime-picker-header">
-              <button type="button" className="nav-btn" onClick={handlePrevYear} aria-label="上一年">‹‹</button>
-              <button type="button" className="nav-btn" onClick={handlePrevMonth} aria-label="上个月">‹</button>
-              <span className="month-year" id="datetime-picker-title">{currentYear}年 {monthNames[currentMonth]}</span>
-              <button type="button" className="nav-btn" onClick={handleNextMonth} aria-label="下个月">›</button>
-              <button type="button" className="nav-btn" onClick={handleNextYear} aria-label="下一年">››</button>
+              <button
+                type="button"
+                className="nav-btn"
+                onClick={handlePrevYear}
+                aria-label="上一年"
+              >
+                ‹‹
+              </button>
+              <button
+                type="button"
+                className="nav-btn"
+                onClick={handlePrevMonth}
+                aria-label="上个月"
+              >
+                ‹
+              </button>
+              <span className="month-year" id="datetime-picker-title">
+                {currentYear}年 {monthNames[currentMonth]}
+              </span>
+              <button
+                type="button"
+                className="nav-btn"
+                onClick={handleNextMonth}
+                aria-label="下个月"
+              >
+                ›
+              </button>
+              <button
+                type="button"
+                className="nav-btn"
+                onClick={handleNextYear}
+                aria-label="下一年"
+              >
+                ››
+              </button>
             </div>
 
             <div className="datetime-picker-content">
               <div className="calendar-grid">
                 <div className="weekdays">
-                  {weekDays.map(day => (
-                    <div key={day} className="weekday">{day}</div>
+                  {weekDays.map((day) => (
+                    <div key={day} className="weekday">
+                      {day}
+                    </div>
                   ))}
                 </div>
-                <div className="calendar-body">
-                  {renderCalendar()}
-                </div>
+                <div className="calendar-body">{renderCalendar()}</div>
               </div>
             </div>
 

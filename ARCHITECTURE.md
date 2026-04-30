@@ -4,8 +4,10 @@
 
 ```
 timestamp-plugin/
+├── .nvmrc                  # Node.js 版本约束
+├── manifest.json           # 扩展程序清单
+├── popup.html               # Vite HTML 入口
 ├── public/                  # 静态资源
-│   ├── manifest.json       # 扩展程序清单
 │   └── icons/             # 扩展程序图标
 │       ├── icon16.png
 │       ├── icon32.png
@@ -23,39 +25,45 @@ timestamp-plugin/
 │   ├── styles/             # 样式文件
 │   │   └── App.css         # 主要样式
 │   ├── App.tsx             # 根组件
-│   ├── index.tsx           # 应用入口点
-│   └── popup.html          # 扩展弹窗模板
+│   └── index.tsx           # React 入口点
 ├── dist/                   # 构建输出目录 (构建后生成)
+├── eslint.config.mjs       # ESLint flat config
+├── prettier.config.mjs     # Prettier 格式化配置
 ├── package.json            # 项目配置
 ├── tsconfig.json          # TypeScript 配置
-├── webpack.config.js      # Webpack 构建配置
+├── vite.config.ts         # Vite 构建配置
 └── README.md              # 项目文档
 ```
 
 ## 组件架构
 
 ### App.tsx (根组件)
+
 - 管理全局状态（当前时间戳、选定时区、时间单位）
 - 协调子组件之间的交互
 - 处理实时时间更新
 
 ### TimestampDisplay.tsx (显示组件)
+
 - 显示格式化的时间戳和时间
 - 提供一键复制功能
 - 错误状态处理
 
 ### TimestampConverter.tsx (转换器组件)
+
 - 双向转换功能（时间戳 ↔ 时间）
 - 输入验证和错误处理
 - 快速填充当前时间功能
 
 ### TimezoneSelector.tsx (时区选择器)
+
 - 时区下拉选择
 - 支持 UTC-12 到 UTC+12 完整时区
 
 ## 工具模块
 
 ### utils/timestamp.ts
+
 - `isValidTimestamp()`: 时间戳验证
 - `timestampToUTC()`: 时间戳转UTC毫秒
 - `getCurrentTimestamp()`: 获取当前时间戳
@@ -64,22 +72,28 @@ timestamp-plugin/
 - `copyToClipboard()`: 复制到剪贴板
 
 ### constants/timezones.ts
+
 - 时区配置数据
 - 包含时区标签和偏移值
 
 ## 技术栈
 
-- **React 18**: 用户界面框架
-- **TypeScript**: 类型安全
-- **Webpack 5**: 模块打包
+- **React 19**: 用户界面框架
+- **TypeScript 6**: 类型安全
+- **ESLint 10**: 静态代码检查
+- **Prettier 3**: 代码格式化
+- **Vite 8 + CRXJS**: 构建、打包与扩展开发模式
 - **CSS3**: 样式和动画（渐变、毛玻璃效果）
 - **Chrome Extension API**: 浏览器扩展功能
 
 ## 构建流程
 
-1. **开发模式**: `npm run dev` - 监听文件变化，自动重新构建
-2. **生产构建**: `npm run build` - 生成优化的生产版本
-3. **类型检查**: `npm run type-check` - 检查 TypeScript 类型
+1. **开发模式**: `npm run dev` - 使用 CRXJS + Vite 启动扩展开发模式并加载 `dist/`
+2. **持续构建**: `npm run dev:watch` - 仅执行 watch 构建到 `dist/`
+3. **生产构建**: `npm run build` - 生成优化的生产版本
+4. **类型检查**: `npm run type-check` - 检查 TypeScript 类型
+5. **代码检查**: `npm run lint` - 执行 ESLint 规则检查
+6. **代码格式化**: `npm run format` - 使用 Prettier 统一格式
 
 ## 代码优化特点
 

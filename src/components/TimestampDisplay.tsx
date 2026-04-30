@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { TimestampUnit, formatTimestamp, isValidTimestamp, copyToClipboard } from '../utils/timestamp';
+import {
+  TimestampUnit,
+  formatTimestamp,
+  isValidTimestamp,
+  copyToClipboard,
+} from '../utils/timestamp';
 
 interface TimestampDisplayProps {
   timestamp: number;
@@ -7,8 +12,14 @@ interface TimestampDisplayProps {
   unit: TimestampUnit;
 }
 
-const TimestampDisplay: React.FC<TimestampDisplayProps> = ({ timestamp, timezone, unit }) => {
-  const [copiedItem, setCopiedItem] = useState<'timestamp' | 'datetime' | null>(null);
+const TimestampDisplay: React.FC<TimestampDisplayProps> = ({
+  timestamp,
+  timezone,
+  unit,
+}) => {
+  const [copiedItem, setCopiedItem] = useState<'timestamp' | 'datetime' | null>(
+    null,
+  );
 
   useEffect(() => {
     if (!copiedItem) {
@@ -33,9 +44,7 @@ const TimestampDisplay: React.FC<TimestampDisplayProps> = ({ timestamp, timezone
     return (
       <div className="timestamp-display">
         <div className="timestamp-info">
-          <div className="result-text error">
-            时间戳过大或无效，无法显示
-          </div>
+          <div className="result-text error">时间戳过大或无效，无法显示</div>
         </div>
       </div>
     );
@@ -44,13 +53,11 @@ const TimestampDisplay: React.FC<TimestampDisplayProps> = ({ timestamp, timezone
   let formattedDate: string;
   try {
     formattedDate = formatTimestamp(timestamp, unit, timezone);
-  } catch (error) {
+  } catch {
     return (
       <div className="timestamp-display">
         <div className="timestamp-info">
-          <div className="result-text error">
-            时间格式错误
-          </div>
+          <div className="result-text error">时间格式错误</div>
         </div>
       </div>
     );
@@ -68,7 +75,9 @@ const TimestampDisplay: React.FC<TimestampDisplayProps> = ({ timestamp, timezone
             aria-label={`复制格式化时间 ${formattedDate}`}
           >
             {formattedDate}
-            {copiedItem === 'datetime' && <span className="copy-indicator">✓</span>}
+            {copiedItem === 'datetime' && (
+              <span className="copy-indicator">✓</span>
+            )}
           </button>
           <button
             type="button"
@@ -78,7 +87,9 @@ const TimestampDisplay: React.FC<TimestampDisplayProps> = ({ timestamp, timezone
             aria-label={`复制时间戳 ${timestamp}`}
           >
             {timestamp}
-            {copiedItem === 'timestamp' && <span className="copy-indicator">✓</span>}
+            {copiedItem === 'timestamp' && (
+              <span className="copy-indicator">✓</span>
+            )}
           </button>
         </div>
         <span className="sr-only" aria-live="polite">
