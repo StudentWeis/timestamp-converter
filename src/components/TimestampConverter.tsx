@@ -1,11 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import TimestampDisplay from './TimestampDisplay';
+import React, { useEffect, useRef, useState } from 'react';
 import DateTimePicker from './DateTimePicker';
 import { 
   TimestampUnit, 
   getCurrentTimestamp as getTimestamp, 
+  formatTimestamp,
   isValidTimestamp, 
-  parseDateTime
+  parseDateTime,
+  timestampToUTC,
+  utcMillisecondsToTimestamp,
 } from '../utils/timestamp';
 
 interface TimestampConverterProps {
@@ -16,149 +18,194 @@ interface TimestampConverterProps {
 const TimestampConverter: React.FC<TimestampConverterProps> = ({ timezone, unit }) => {
   const [inputTimestamp, setInputTimestamp] = useState<string>('');
   const [inputDateTime, setInputDateTime] = useState<string>('');
-  const [convertedResult, setConvertedResult] = useState<string>('');
-  const [resultTimestamp, setResultTimestamp] = useState<number | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string>('');
+  const [syncedUtcTime, setSyncedUtcTime] = useState<number | null>(null);
   const [isDatePickerOpen, setIsDatePickerOpen] = useState<boolean>(false);
+  const dateTimeInputRef = useRef<HTMLInputElement>(null);
+  const datePickerTriggerRef = useRef<HTMLButtonElement>(null);
+  const previousConfigRef = useRef({ timezone, unit });
+  const timestampError = inputTimestamp.trim() !== '' && errorMessage !== '';
+  const dateTimeError = inputDateTime.trim() !== '' && errorMessage !== '';
 
-  const handleTimestampInputChange = (value: string) => {
-    // Only allow digits and handle empty strings
+  const closeDatePicker = () => {
+    setIsDatePickerOpen(false);
+    window.requestAnimationFrame(() => {
+      datePickerTriggerRef.current?.focus();
+    });
+  };
+
+  const syncFromTimestamp = (value: string) => {
     if (value !== '' && !/^\d+$/.test(value)) {
       return;
     }
 
-    // Limit input length to prevent extremely large numbers
     if (value.length > 20) {
       return;
     }
 
     setInputTimestamp(value);
-    if (inputDateTime !== '') {
+    if (value.trim() === '') {
+      setInputTimestamp('');
       setInputDateTime('');
+      setSyncedUtcTime(null);
+      setErrorMessage('');
+      return;
     }
-    setResultTimestamp(null);
-    setConvertedResult('');
+
+    try {
+      const timestamp = Number.parseInt(value, 10);
+
+      if (!isValidTimestamp(timestamp, unit)) {
+        throw new Error('Invalid timestamp');
+      }
+
+      setInputDateTime(formatTimestamp(timestamp, unit, timezone));
+      setSyncedUtcTime(timestampToUTC(timestamp, unit));
+      setErrorMessage('');
+    } catch (error) {
+      setInputDateTime('');
+      setSyncedUtcTime(null);
+      setErrorMessage('时间戳超出合理范围或无效');
+    }
   };
 
-  const handleDateTimeInputChange = (value: string) => {
+  const syncFromDateTime = (value: string) => {
     setInputDateTime(value);
-    if (inputTimestamp !== '') {
+
+    if (value.trim() === '') {
       setInputTimestamp('');
+      setInputDateTime('');
+      setSyncedUtcTime(null);
+      setErrorMessage('');
+      return;
     }
-    setResultTimestamp(null);
-    setConvertedResult('');
+
+    try {
+      const timestamp = parseDateTime(value, unit, timezone);
+
+      if (!isValidTimestamp(timestamp, unit)) {
+        throw new Error('Invalid timestamp range');
+      }
+
+      setInputTimestamp(timestamp.toString());
+      setSyncedUtcTime(timestampToUTC(timestamp, unit));
+      setErrorMessage('');
+    } catch (error) {
+      setInputTimestamp('');
+      setSyncedUtcTime(null);
+      setErrorMessage('无效的日期格式。请使用：YYYY-MM-DD HH:MM:SS');
+    }
   };
 
   const getCurrentTimestamp = () => {
-    const timestamp = getTimestamp(unit);
-    setInputTimestamp(timestamp.toString());
+    syncFromTimestamp(getTimestamp(unit).toString());
   };
 
   const getCurrentDateTime = () => {
-    // 打开日历选择器而不是直接填入当前时间
     setIsDatePickerOpen(true);
   };
 
   const handleDateTimeSelect = (selectedDateTime: string) => {
-    setInputDateTime(selectedDateTime);
+    syncFromDateTime(selectedDateTime);
     setIsDatePickerOpen(false);
+    window.requestAnimationFrame(() => {
+      dateTimeInputRef.current?.focus();
+    });
   };
 
-  // Auto-convert timestamp when input changes
   useEffect(() => {
-    if (inputTimestamp.trim() !== '') {
-      try {
-        const timestamp = parseInt(inputTimestamp, 10);
-        if (!isNaN(timestamp) && isValidTimestamp(timestamp, unit)) {
-          setResultTimestamp(timestamp);
-          setConvertedResult('');
-        } else {
-          setConvertedResult('时间戳超出合理范围或无效');
-          setResultTimestamp(null);
-        }
-      } catch (error) {
-        setConvertedResult('时间戳过大或无效');
-        setResultTimestamp(null);
-      }
-    } else {
-      setConvertedResult('');
-      setResultTimestamp(null);
-    }
-  }, [inputTimestamp, timezone, unit]);
+    const previousConfig = previousConfigRef.current;
+    const configChanged = previousConfig.timezone !== timezone || previousConfig.unit !== unit;
 
-  // Auto-convert datetime when input changes
-  useEffect(() => {
-    if (inputDateTime.trim() !== '') {
-      try {
-        const timestamp = parseDateTime(inputDateTime, unit, timezone);
-        setResultTimestamp(timestamp);
-        setConvertedResult('');
-      } catch (error) {
-        setConvertedResult('无效的日期格式。请使用：YYYY-MM-DD HH:MM:SS');
-        setResultTimestamp(null);
-      }
-    } else if (inputTimestamp.trim() === '') {
-      setConvertedResult('');
-      setResultTimestamp(null);
+    previousConfigRef.current = { timezone, unit };
+
+    if (!configChanged || syncedUtcTime === null) {
+      return;
     }
-  }, [inputDateTime, timezone, unit]);
+
+    const nextTimestamp = utcMillisecondsToTimestamp(syncedUtcTime, unit);
+
+    if (!isValidTimestamp(nextTimestamp, unit)) {
+      setInputTimestamp('');
+      setInputDateTime('');
+      setSyncedUtcTime(null);
+      setErrorMessage('时间戳超出合理范围或无效');
+      return;
+    }
+
+    setInputTimestamp(nextTimestamp.toString());
+    setInputDateTime(formatTimestamp(nextTimestamp, unit, timezone));
+    setErrorMessage('');
+  }, [syncedUtcTime, timezone, unit]);
 
   return (
     <div className="timestamp-converter">
-      <h3>时间戳转换</h3>
-      
-      {/* Timestamp to DateTime */}
-      <div className="converter-section">
+      <div className="field-group converter-section">
+        <label className="sr-only" htmlFor="timestamp-input">时间戳</label>
         <div className="input-group">
           <input
+            id="timestamp-input"
             type="text"
-            placeholder="输入时间戳"
+            placeholder="时间戳"
             value={inputTimestamp}
-            onChange={(e) => handleTimestampInputChange(e.target.value)}
+            onChange={(e) => syncFromTimestamp(e.target.value)}
             className="converter-input"
+            inputMode="numeric"
+            aria-invalid={timestampError}
+            aria-describedby={timestampError ? 'converter-status' : undefined}
           />
-          <button onClick={getCurrentTimestamp} className="fill-btn" title="填入当前时间戳">
+          <button
+            type="button"
+            onClick={getCurrentTimestamp}
+            className="fill-btn"
+            title="填入当前时间戳"
+            aria-label="填入当前时间戳"
+          >
             现在
           </button>
         </div>
       </div>
 
-      {/* DateTime to Timestamp */}
-      <div className="converter-section">
+      <div className="field-group converter-section">
+        <label className="sr-only" htmlFor="datetime-input">日期时间</label>
         <div className="input-group">
           <input
+            ref={dateTimeInputRef}
+            id="datetime-input"
             type="text"
             placeholder="YYYY-MM-DD HH:MM:SS"
             value={inputDateTime}
-            onChange={(e) => handleDateTimeInputChange(e.target.value)}
+            onChange={(e) => syncFromDateTime(e.target.value)}
             className="converter-input"
+            aria-invalid={dateTimeError}
+            aria-describedby={dateTimeError ? 'converter-status' : undefined}
           />
-          <button onClick={getCurrentDateTime} className="fill-btn calendar-btn" title="打开日历选择器">
-            📅 选择日期
+          <button
+            ref={datePickerTriggerRef}
+            type="button"
+            onClick={getCurrentDateTime}
+            className="fill-btn calendar-btn"
+            title="打开日期时间选择器"
+            aria-label="打开日期时间选择器"
+            aria-haspopup="dialog"
+            aria-expanded={isDatePickerOpen}
+            aria-controls="datetime-picker-dialog"
+          >
+            日期
           </button>
         </div>
       </div>
 
-      {/* Date Time Picker */}
       <DateTimePicker
         isOpen={isDatePickerOpen}
-        onClose={() => setIsDatePickerOpen(false)}
+        onClose={closeDatePicker}
         onSelect={handleDateTimeSelect}
         timezone={timezone}
         initialValue={inputDateTime}
       />
 
-      {/* Result using TimestampDisplay component */}
-      {resultTimestamp !== null && (
-        <TimestampDisplay
-          timestamp={resultTimestamp}
-          timezone={timezone}
-          unit={unit}
-        />
-      )}
-
-      {/* Error message */}
-      {convertedResult && resultTimestamp === null && (
-        <div className="result-text error">{convertedResult}</div>
+      {errorMessage && (
+        <div className="result-text error" id="converter-status" role="alert">{errorMessage}</div>
       )}
     </div>
   );

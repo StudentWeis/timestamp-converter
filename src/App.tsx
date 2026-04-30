@@ -26,10 +26,6 @@ const App: React.FC = () => {
 
   return (
     <div className="app">
-      <header className="app-header">
-        <h1>🕐 时间戳转换工具</h1>
-      </header>
-
       <main className="app-main">
         <section className="section">
           <div className="timezone-controls">
@@ -37,25 +33,34 @@ const App: React.FC = () => {
               selectedTimezone={selectedTimezone}
               onTimezoneChange={setSelectedTimezone}
             />
-            <div className="unit-selector">
+            <div className="unit-control">
+              <span className="sr-only" id="timestamp-unit-label">精度</span>
+              <div className="unit-selector" role="group" aria-labelledby="timestamp-unit-label">
               <button
+                type="button"
                 className={`unit-btn ${timestampUnit === 'seconds' ? 'active' : ''}`}
                 onClick={() => handleUnitChange('seconds')}
+                aria-pressed={timestampUnit === 'seconds'}
               >
                 秒
               </button>
               <button
+                type="button"
                 className={`unit-btn ${timestampUnit === 'milliseconds' ? 'active' : ''}`}
                 onClick={() => handleUnitChange('milliseconds')}
+                aria-pressed={timestampUnit === 'milliseconds'}
               >
                 毫秒
               </button>
               <button
+                type="button"
                 className={`unit-btn ${timestampUnit === 'microseconds' ? 'active' : ''}`}
                 onClick={() => handleUnitChange('microseconds')}
+                aria-pressed={timestampUnit === 'microseconds'}
               >
                 微秒
               </button>
+              </div>
             </div>
           </div>
           <TimestampDisplay

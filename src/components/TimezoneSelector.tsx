@@ -17,11 +17,14 @@ const TimezoneSelector: React.FC<TimezoneSelectProps> = ({
 
   return (
     <div className="timezone-selector compact">
+      <label className="sr-only" htmlFor="timezone-select">时区</label>
       <div className="selector-container">
         <select
+          id="timezone-select"
           value={selectedTimezone}
           onChange={handleTimezoneChange}
           className="timezone-select"
+          aria-label="选择时区"
         >
           {timezones.map((tz) => (
             <option key={tz.value} value={tz.value}>

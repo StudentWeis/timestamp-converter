@@ -34,6 +34,23 @@ export const timestampToUTC = (timestamp: number, unit: TimestampUnit): number =
 };
 
 /**
+ * Converts UTC milliseconds to the specified timestamp unit
+ */
+export const utcMillisecondsToTimestamp = (
+  utcMilliseconds: number,
+  unit: TimestampUnit
+): number => {
+  switch (unit) {
+    case 'seconds':
+      return Math.floor(utcMilliseconds / 1000);
+    case 'milliseconds':
+      return utcMilliseconds;
+    case 'microseconds':
+      return utcMilliseconds * 1000;
+  }
+};
+
+/**
  * Gets current timestamp in specified unit
  */
 export const getCurrentTimestamp = (unit: TimestampUnit): number => {
@@ -79,18 +96,38 @@ export const parseDateTime = (
   unit: TimestampUnit,
   timezoneOffset: number
 ): number => {
-  const date = new Date(dateTimeString + 'Z');
-  const utcTime = date.getTime();
-  const localTime = utcTime - (timezoneOffset * 60 * 60 * 1000);
+  const trimmedValue = dateTimeString.trim();
+  const match = trimmedValue.match(/^(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2}):(\d{2})$/);
 
-  switch (unit) {
-    case 'seconds':
-      return Math.floor(localTime / 1000);
-    case 'milliseconds':
-      return localTime;
-    case 'microseconds':
-      return localTime * 1000;
+  if (!match) {
+    throw new Error('Invalid date format');
   }
+
+  const [, yearValue, monthValue, dayValue, hourValue, minuteValue, secondValue] = match;
+  const year = Number(yearValue);
+  const month = Number(monthValue);
+  const day = Number(dayValue);
+  const hour = Number(hourValue);
+  const minute = Number(minuteValue);
+  const second = Number(secondValue);
+
+  const localReference = new Date(Date.UTC(year, month - 1, day, hour, minute, second));
+
+  if (
+    Number.isNaN(localReference.getTime()) ||
+    localReference.getUTCFullYear() !== year ||
+    localReference.getUTCMonth() !== month - 1 ||
+    localReference.getUTCDate() !== day ||
+    localReference.getUTCHours() !== hour ||
+    localReference.getUTCMinutes() !== minute ||
+    localReference.getUTCSeconds() !== second
+  ) {
+    throw new Error('Invalid date');
+  }
+
+  const utcMilliseconds = localReference.getTime() - (timezoneOffset * 60 * 60 * 1000);
+
+  return utcMillisecondsToTimestamp(utcMilliseconds, unit);
 };
 
 /**
