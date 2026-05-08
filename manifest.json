@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "时间戳转换工具",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "具有实时显示，双向转换和多 UTC 支持、以及单位切换等功能。",
   "action": {
     "default_popup": "popup.html",

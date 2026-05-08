@@ -1,6 +1,6 @@
 {
   "name": "unix-timestamp-converter-extension",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "A modern Unix timestamp converter extension for Microsoft Edge browser with timezone support",
   "packageManager": "npm@11.12.1",
   "scripts": {

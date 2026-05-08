@@ -199,9 +199,9 @@ _支持从 UTC-12 到 UTC+12 的所有时区_
 
 ```json
 {
-  "manifest_version": 3,
-  "name": "时间戳转换工具",
-  "version": "1.0.2"
+   "manifest_version": 3,
+   "name": "时间戳转换工具",
+   "version": "1.1.0"
 }
 ```
 
@@ -212,16 +212,6 @@ _支持从 UTC-12 到 UTC+12 的所有时区_
 3. 提交更改 (`git commit -m 'Add amazing feature'`)
 4. 推送到分支 (`git push origin feature/amazing-feature`)
 5. 创建 Pull Request
-
-## 📝 更新日志
-
-### v1.0.0 (2024-08-07)
-
-- ✨ 初始版本发布
-- 🎯 支持三种时间戳精度
-- 🌍 完整时区支持
-- 📱 响应式界面设计
-- 🔄 双向转换功能
 
 ## 📄 许可证
 
